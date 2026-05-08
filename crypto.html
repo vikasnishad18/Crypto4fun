@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crypto For Fun — Crypto Trading Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+<style>
+/* ─── RESET & BASE ─────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg:        #0d0d0d;
+  --bg2:       #111111;
+  --bg3:       #161616;
+  --card:      #131313;
+  --border:    rgba(255,255,255,0.07);
+  --border-hi: rgba(255,255,255,0.14);
+  --neon:      #c8ff00;
+  --text:      #e8e8e8;
+  --muted:     #666;
+  --muted2:    #444;
+  --white:     #ffffff;
+  --red:       #ff4444;
+  --green:     #22c55e;
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ─── SCROLLBAR ────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+
+/* ─── NAV ──────────────────────────────────────────────────── */
+nav {
+  position: fixed; top: 0; width: 100%;
+  background: rgba(13,13,13,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  z-index: 1000;
+  height: 60px;
+  display: flex; align-items: center;
+  padding: 0 48px;
+  justify-content: space-between;
+}
+
+.logo {
+  font-family: var(--font-head);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  text-decoration: none;
+}
+
+.logo em { color: var(--neon); font-style: normal; }
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 28px;
+  align-items: center;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 400;
+  transition: color 0.15s;
+}
+
+.nav-links a:hover { color: var(--text); }
+
+.btn-enroll {
+  background: var(--neon);
+  color: #000;
+  border: none;
+  padding: 9px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: opacity 0.15s;
+  font-family: var(--font-body);
+}
+
+.btn-enroll:hover { opacity: 0.85; }
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* ─── TICKER ───────────────────────────────────────────────── */
+.ticker-bar {
+  position: fixed; top: 60px; width: 100%;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  z-index: 999;
+  overflow: hidden;
+  height: 36px;
+  display: flex; align-items: center;
+}
+
+.ticker-inner {
+  display: flex; gap: 40px;
+  white-space: nowrap;
+  animation: ticker-scroll 40s linear infinite;
+  width: max-content;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.tick {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px;
+}
+
+.tick-sym   { color: var(--muted); font-weight: 500; }
+.tick-price { color: var(--text); }
+.up  { color: var(--green); }
+.dn  { color: var(--red); }
+
+/* ─── SHARED SECTION STYLES ────────────────────────────────── */
+section { padding: 96px 48px; }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--neon);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+h2 {
+  font-family: var(--font-head);
+  font-size: clamp(26px, 3vw, 42px);
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.sec-desc {
+  font-size: 15px;
+  color: var(--muted);
+  max-width: 440px;
+  line-height: 1.75;
+}
+
+/* ─── HERO ─────────────────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 130px;
+  max-width: 960px;
+}
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  width: fit-content;
+}
+
+.hero-tag-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--neon);
+}
+
+h1 {
+  font-family: var(--font-head);
+  font-size: clamp(40px, 5.5vw, 74px);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.0;
+  letter-spacing: -2.5px;
+  margin-bottom: 24px;
+}
+
+h1 .dim { color: #2e2e2e; }
+h1 .hi  { color: var(--neon); }
+
+.hero-desc {
+  font-size: 17px;
+  color: var(--muted);
+  max-width: 480px;
+  font-weight: 400;
+  line-height: 1.75;
+  margin-bottom: 36px;
+}
+
+.hero-actions {
+  display: flex; gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: var(--neon);
+  color: #000;
+  border: none;
+  padding: 14px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: opacity 0.15s;
+  font-family: var(--font-body);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 13px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-ghost:hover {
+  border-color: var(--border-hi);
+  color: var(--text);
+}
+
+.hero-stats {
+  display: flex; gap: 0;
+  margin-top: 64px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.stat {
+  padding: 28px 40px 0 0;
+  border-right: 1px solid var(--border);
+  margin-right: 40px;
+}
+
+.stat:last-child { border-right: none; margin-right: 0; }
+
+.stat-n {
+  font-family: var(--font-head);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -1px;
+}
+
+.stat-l {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ─── CHARTS ───────────────────────────────────────────────── */
+#charts { background: var(--bg2); }
+
+.chart-tabs {
+  display: flex; gap: 4px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.ct-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+}
+
+.ct-btn:hover {
+  border-color: var(--border-hi);
+  color: var(--text);
+}
+
+.ct-btn.active {
+  background: var(--neon);
+  border-color: var(--neon);
+  color: #000;
+}
+
+.chart-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+}
+
+.chart-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.chart-sym {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.chart-price-big {
+  font-family: var(--font-head);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -1px;
+}
+
+.chart-chg { font-size: 13px; margin-top: 4px; }
+
+.chart-canvas-wrap {
+  height: 200px;
+  position: relative;
+}
+
+.chart-meta-row {
+  display: flex; gap: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.cm-item { font-size: 11px; color: var(--muted); }
+.cm-item span {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+/* ─── CURRICULUM ────────────────────────────────────────────── */
+#curriculum { background: var(--bg); }
+
+.cur-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 40px;
+}
+
+.mod {
+  background: var(--bg);
+  padding: 28px 24px;
+  transition: background 0.15s;
+  cursor: default;
+}
+
+.mod:hover { background: var(--bg3); }
+
+.mod-n {
+  font-size: 11px;
+  color: var(--muted2);
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+.mod-t {
+  font-family: var(--font-head);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+
+.mod-d {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.mod-foot {
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--muted2);
+  display: flex; gap: 12px;
+}
+
+/* ─── ABOUT ─────────────────────────────────────────────────── */
+#about {
+  background: var(--bg2);
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.about-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 32px;
+  text-align: center;
+}
+
+.av {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border-hi);
+  margin: 0 auto 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-head);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--neon);
+}
+
+.av-name {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+.av-role { font-size: 12px; color: var(--muted); margin-bottom: 24px; }
+
+.av-stats {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 24px;
+  border: 1px solid var(--border);
+}
+
+.avs { background: var(--bg2); padding: 16px 8px; text-align: center; }
+
+.avs-n {
+  font-family: var(--font-head);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--neon);
+  letter-spacing: -0.5px;
+}
+
+.avs-l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.about-body h2 { margin-bottom: 16px; }
+
+.about-body p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+
+.badge {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ─── TESTIMONIALS ──────────────────────────────────────────── */
+#testimonials { background: var(--bg); }
+
+.testi-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.testi {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  transition: border-color 0.15s;
+}
+
+.testi:hover { border-color: var(--border-hi); }
+
+.stars { color: var(--neon); font-size: 12px; letter-spacing: 2px; margin-bottom: 14px; }
+
+.testi-txt {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.75;
+  margin-bottom: 20px;
+}
+
+.testi-auth { display: flex; align-items: center; gap: 10px; }
+
+.tav {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  flex-shrink: 0;
+}
+
+.tname { font-size: 13px; font-weight: 600; color: var(--text); }
+.tmeta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+/* ─── PRICING ───────────────────────────────────────────────── */
+#pricing { background: var(--bg2); }
+
+.price-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.pc {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 28px 24px;
+  position: relative;
+  transition: border-color 0.15s;
+}
+
+.pc:hover { border-color: var(--border-hi); }
+
+.pc.feat {
+  border-color: var(--neon);
+  background: #111a00;
+}
+
+.feat-tag {
+  position: absolute; top: -11px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--neon);
+  color: #000;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.pc-tier {
+  font-size: 12px; color: var(--muted);
+  font-weight: 500; text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 12px;
+}
+
+.pc-price {
+  font-family: var(--font-head);
+  font-size: 42px; font-weight: 700;
+  color: var(--white);
+  letter-spacing: -2px; line-height: 1;
+}
+
+.pc-price sup {
+  font-size: 18px;
+  vertical-align: super;
+  letter-spacing: 0;
+}
+
+.pc-note { font-size: 11px; color: var(--muted); margin: 8px 0 24px; }
+
+.pc-list { list-style: none; margin-bottom: 28px; }
+
+.pc-list li {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+
+.pc-list li.on { color: var(--text); }
+.pc-list li::before    { content: '—'; font-size: 10px; color: var(--muted2); flex-shrink: 0; }
+.pc-list li.on::before { content: '✓'; color: var(--neon); }
+
+/* ─── NEWSLETTER ────────────────────────────────────────────── */
+#newsletter {
+  background: var(--bg);
+  text-align: center;
+}
+
+#newsletter h2 { margin-bottom: 12px; }
+#newsletter .sec-desc { margin: 0 auto; }
+
+.nl-form {
+  display: flex; gap: 8px;
+  margin: 28px auto 0;
+  max-width: 480px;
+  flex-wrap: wrap;
+}
+
+.nl-input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.nl-input::placeholder { color: var(--muted2); }
+.nl-input:focus { border-color: var(--border-hi); }
+
+.nl-btn {
+  background: var(--neon);
+  color: #000;
+  border: none;
+  padding: 12px 22px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.nl-btn:hover { opacity: 0.85; }
+
+.nl-note {
+  font-size: 12px;
+  color: var(--muted2);
+  margin-top: 12px;
+}
+
+/* ─── FOOTER ────────────────────────────────────────────────── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-copy { font-size: 12px; color: var(--muted2); }
+
+.footer-links { display: flex; gap: 20px; }
+
+.footer-links a {
+  font-size: 12px;
+  color: var(--muted2);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover { color: var(--muted); }
+
+/* ─── MODAL ─────────────────────────────────────────────────── */
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border-hi);
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%; max-width: 420px;
+  position: relative;
+}
+
+.modal-x {
+  position: absolute; top: 14px; right: 14px;
+  background: none; border: none;
+  color: var(--muted); font-size: 18px;
+  cursor: pointer; line-height: 1;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 4px;
+  transition: background 0.1s;
+}
+
+.modal-x:hover { background: var(--bg3); color: var(--text); }
+
+.modal h3 {
+  font-family: var(--font-head);
+  font-size: 20px; font-weight: 700;
+  color: var(--white); letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+
+.modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+.fl { margin-bottom: 14px; }
+
+.fl label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.fi, .fs {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  padding: 11px 14px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.fi:focus, .fs:focus { border-color: var(--border-hi); }
+.fs { cursor: pointer; }
+.fs option { background: var(--bg2); }
+
+.submit {
+  width: 100%;
+  background: var(--neon);
+  color: #000;
+  border: none;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  margin-top: 6px;
+  transition: opacity 0.15s;
+}
+
+.submit:hover { opacity: 0.85; }
+
+/* ─── TOAST ─────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--bg3);
+  border: 1px solid var(--border-hi);
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 13px;
+  color: var(--text);
+  z-index: 99999;
+  transform: translateY(16px);
+  opacity: 0;
+  transition: all 0.25s;
+  display: flex; align-items: center; gap: 10px;
+  max-width: 320px;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.toast-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--neon);
+  flex-shrink: 0;
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  nav { padding: 0 20px; }
+  section { padding: 72px 20px; }
+
+  .nav-links { display: none; flex-direction: column; gap: 0; }
+  .nav-links.open {
+    display: flex;
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 0;
+  }
+  .nav-links.open a,
+  .nav-links.open button {
+    padding: 12px 24px;
+    width: 100%;
+    text-align: left;
+    border-radius: 0;
+  }
+  .nav-toggle { display: block; }
+
+  h1 { letter-spacing: -1.5px; }
+
+  .hero-stats { flex-direction: column; gap: 0; }
+  .stat { border-right: none; border-bottom: 1px solid var(--border); padding: 20px 0; margin: 0; }
+  .stat:last-child { border-bottom: none; }
+
+  .cur-grid { grid-template-columns: 1fr; }
+  #about { grid-template-columns: 1fr; gap: 40px; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .price-grid { grid-template-columns: 1fr; }
+
+  footer { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ──────────────────────────────────────────────────── -->
+<nav>
+  <a href="#hero" class="logo">Crypto <em>For Fun</em></a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#charts">Markets</a></li>
+    <li><a href="#curriculum">Curriculum</a></li>
+    <li><a href="#about">Instructor</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><button class="btn-enroll" onclick="openModal()">Enroll</button></li>
+  </ul>
+
+  <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">☰</button>
+</nav>
+
+<!-- ─── TICKER ────────────────────────────────────────────────── -->
+<div class="ticker-bar" aria-hidden="true">
+  <div class="ticker-inner" id="tickerEl"></div>
+</div>
+
+<!-- ─── HERO ──────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-tag">
+    <span class="hero-tag-dot"></span>
+    Cohort 12 now open &nbsp;·&nbsp; 47 seats remaining
+  </div>
+
+  <h1>
+    Learn to trade<br>
+    <span class="dim">crypto</span> like a<br>
+    <span class="hi">professional.</span>
+  </h1>
+
+  <p class="hero-desc">
+    From blockchain fundamentals to advanced DeFi strategies — taught by a professional trader
+    with 8 years in the market. No hype. Just signal.
+  </p>
+
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="openModal()">Start Learning →</button>
+    <a href="#curriculum" class="btn-ghost">View curriculum</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-n">4,200+</div>
+      <div class="stat-l">Students enrolled</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">94%</div>
+      <div class="stat-l">Completion rate</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">4.9 / 5</div>
+      <div class="stat-l">Average rating</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">8 yrs</div>
+      <div class="stat-l">Market experience</div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CHARTS ────────────────────────────────────────────────── -->
+<section id="charts">
+  <div class="eyebrow">Live Markets</div>
+  <h2>Real-time crypto data</h2>
+  <p class="sec-desc">The same market data your instructor trades with — updated every few seconds.</p>
+
+  <div class="chart-tabs" style="margin-top:32px;">
+    <button class="ct-btn active" onclick="switchChart('BTC', this)">BTC / USDT</button>
+    <button class="ct-btn" onclick="switchChart('ETH', this)">ETH / USDT</button>
+    <button class="ct-btn" onclick="switchChart('SOL', this)">SOL / USDT</button>
+    <button class="ct-btn" onclick="switchChart('BNB', this)">BNB / USDT</button>
+  </div>
+
+  <div class="chart-panel">
+    <div class="chart-top">
+      <div>
+        <div class="chart-sym" id="csym">BTC / USDT</div>
+        <div class="chart-price-big" id="cprice">$67,420</div>
+        <div class="chart-chg up" id="cchg">+2.3% (24h)</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">24H RANGE</div>
+        <div style="font-size:13px;color:var(--text);font-weight:500;" id="crange">$65,100 – $68,900</div>
+      </div>
+    </div>
+
+    <div class="chart-canvas-wrap">
+      <canvas id="priceChart"></canvas>
+    </div>
+
+    <div class="chart-meta-row">
+      <div class="cm-item">Volume 24h<span id="cvol">$48.2B</span></div>
+      <div class="cm-item">Market cap<span id="ccap">$1.32T</span></div>
+      <div class="cm-item">Last update<span id="ctime">—</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CURRICULUM ────────────────────────────────────────────── -->
+<section id="curriculum">
+  <div class="eyebrow">What you'll learn</div>
+  <h2>10 modules. Zero fluff.</h2>
+  <p class="sec-desc">A structured path from complete beginner to confident, strategy-driven trader.</p>
+
+  <div class="cur-grid">
+    <div class="mod">
+      <div class="mod-n">01</div>
+      <div class="mod-t">Crypto Fundamentals</div>
+      <div class="mod-d">Blockchain architecture, wallets, keys and why crypto actually exists.</div>
+      <div class="mod-foot"><span>8 lessons</span><span>3.5 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">02</div>
+      <div class="mod-t">Bitcoin Deep Dive</div>
+      <div class="mod-d">Halving cycles, on-chain metrics, the Lightning Network and the long-term thesis.</div>
+      <div class="mod-foot"><span>7 lessons</span><span>4 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">03</div>
+      <div class="mod-t">Altcoin Research</div>
+      <div class="mod-d">How to evaluate projects — tokenomics, team signals, roadmaps and sector rotation.</div>
+      <div class="mod-foot"><span>9 lessons</span><span>5 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">04</div>
+      <div class="mod-t">Technical Analysis</div>
+      <div class="mod-d">Chart patterns, RSI, MACD, Bollinger Bands, support and resistance levels.</div>
+      <div class="mod-foot"><span>12 lessons</span><span>7 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">05</div>
+      <div class="mod-t">DeFi Mastery</div>
+      <div class="mod-d">Uniswap, Aave, yield farming, liquidity pools and navigating impermanent loss.</div>
+      <div class="mod-foot"><span>10 lessons</span><span>6 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">06</div>
+      <div class="mod-t">Risk Management</div>
+      <div class="mod-d">Position sizing, stop losses, portfolio allocation and the psychology of trading.</div>
+      <div class="mod-foot"><span>6 lessons</span><span>3 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">07</div>
+      <div class="mod-t">On-Chain Analytics</div>
+      <div class="mod-d">Reading whale wallets, exchange flows, SOPR, MVRV and Glassnode data.</div>
+      <div class="mod-foot"><span>8 lessons</span><span>4 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">08</div>
+      <div class="mod-t">Derivatives & Futures</div>
+      <div class="mod-d">Perpetuals, funding rates, options basics and how to hedge your portfolio.</div>
+      <div class="mod-foot"><span>9 lessons</span><span>5.5 hrs</span></div>
+    </div>
+    <div class="mod">
+      <div class="mod-n">09</div>
+      <div class="mod-t">Portfolio Strategy</div>
+      <div class="mod-d">Building and rebalancing a portfolio across bull and bear market cycles.</div>
+      <div class="mod-foot"><span>7 lessons</span><span>4 hrs</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ──────────────────────────────────────────────────── -->
+<section id="about">
+  <div class="about-card">
+    <div class="av">AX</div>
+    <div class="av-name">Vishwajeet</div>
+    <div class="av-role">Crypto trader · educator · ex-quant analyst</div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-top:16px;">
+      "I built this course because I wish it existed when I started. I made every mistake in the book — so you don't have to."
+    </div>
+    <div class="av-stats">
+      <div class="avs"><div class="avs-n">8+</div><div class="avs-l">Yrs trading</div></div>
+      <div class="avs"><div class="avs-n">4.2K</div><div class="avs-l">Students</div></div>
+      <div class="avs"><div class="avs-n">4.9★</div><div class="avs-l">Rating</div></div>
+    </div>
+  </div>
+
+  <div class="about-body">
+    <div class="eyebrow">Your instructor</div>
+    <h2>Market experience<br>you can learn from.</h2>
+    <p>
+      Vishwajeet has been trading crypto since 2016 — through the ICO boom, the DeFi summer,
+      the NFT wave, and every bear market since. He's survived every crash and emerged
+      with a methodology that actually works across cycles.
+    </p>
+    <p>
+      Previously a quant analyst at a $200M crypto fund. Featured in CoinDesk, Decrypt
+      and Bankless. He left institutional trading to build the course he wished existed
+      when he was learning.
+    </p>
+    <div class="tag-row">
+      <span class="badge">Technical Analysis</span>
+      <span class="badge">DeFi Protocols</span>
+      <span class="badge">On-chain Research</span>
+      <span class="badge">Portfolio Strategy</span>
+      <span class="badge">Risk Management</span>
+      <span class="badge">Derivatives</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ──────────────────────────────────────────── -->
+<section id="testimonials">
+  <div class="eyebrow">Student results</div>
+  <h2>What students say</h2>
+  <p class="sec-desc">Real feedback from real traders who went through the course.</p>
+
+  <div class="testi-grid">
+    <div class="testi">
+      <div class="stars">★★★★★</div>
+      <p class="testi-txt">
+        The DeFi module alone was worth the price. I was losing money to impermanent
+        loss without even knowing what it was. Finally clicked here.
+      </p>
+      <div class="testi-auth">
+        <div class="tav">RK</div>
+        <div>
+          <div class="tname">Rahul K.</div>
+          <div class="tmeta">Pro Plan · 3 months ago</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi">
+      <div class="stars">★★★★★</div>
+      <p class="testi-txt">
+        Went from buying coins randomly to having an actual strategy. Up 180% over
+        one cycle. This course changed the way I see markets completely.
+      </p>
+      <div class="testi-auth">
+        <div class="tav">SM</div>
+        <div>
+          <div class="tname">Sarah M.</div>
+          <div class="tmeta">Full Access · 6 months ago</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testi">
+      <div class="stars">★★★★★</div>
+      <p class="testi-txt">
+        Vishwajeet doesn't hand you a magic formula — he teaches you how to think. That's
+        worth more than a thousand Telegram trading signals.
+      </p>
+      <div class="testi-auth">
+        <div class="tav">DJ</div>
+        <div>
+          <div class="tname">Dev J.</div>
+          <div class="tmeta">Pro Plan · 1 month ago</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ───────────────────────────────────────────────── -->
+<section id="pricing">
+  <div class="eyebrow">Pricing</div>
+  <h2>Pay once. Learn forever.</h2>
+  <p class="sec-desc">No subscriptions. No upsells. One payment, lifetime access.</p>
+
+  <div class="price-grid">
+    <div class="pc">
+      <div class="pc-tier">Starter</div>
+      <div class="pc-price"><sup>$</sup>97</div>
+      <div class="pc-note">One-time · lifetime access</div>
+      <ul class="pc-list">
+        <li class="on">Modules 1–3 (Fundamentals)</li>
+        <li class="on">Downloadable notes & slides</li>
+        <li class="on">Community Discord access</li>
+        <li>Live trading sessions</li>
+        <li>Portfolio reviews</li>
+        <li>1-on-1 mentorship</li>
+      </ul>
+      <button class="btn-ghost" style="width:100%;text-align:center;" onclick="openModal()">Get started</button>
+    </div>
+
+    <div class="pc feat">
+      <div class="feat-tag">Most popular</div>
+      <div class="pc-tier">Pro</div>
+      <div class="pc-price"><sup>$</sup>297</div>
+      <div class="pc-note">One-time · lifetime access</div>
+      <ul class="pc-list">
+        <li class="on">All 10 modules</li>
+        <li class="on">Downloadable notes & slides</li>
+        <li class="on">Community Discord access</li>
+        <li class="on">Weekly live trading sessions</li>
+        <li class="on">Portfolio reviews</li>
+        <li>1-on-1 mentorship</li>
+      </ul>
+      <button class="btn-primary" style="width:100%;text-align:center;" onclick="openModal()">Enroll in Pro</button>
+    </div>
+
+    <div class="pc">
+      <div class="pc-tier">Elite</div>
+      <div class="pc-price"><sup>$</sup>697</div>
+      <div class="pc-note">One-time · lifetime access</div>
+      <ul class="pc-list">
+        <li class="on">All 10 modules</li>
+        <li class="on">Downloadable notes & slides</li>
+        <li class="on">Community Discord access</li>
+        <li class="on">Weekly live trading sessions</li>
+        <li class="on">Portfolio reviews</li>
+        <li class="on">3× 1-on-1 mentorship calls</li>
+      </ul>
+      <button class="btn-ghost" style="width:100%;text-align:center;" onclick="openModal()">Go Elite</button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NEWSLETTER ────────────────────────────────────────────── -->
+<section id="newsletter">
+  <div class="eyebrow" style="text-align:center;">Stay ahead</div>
+  <h2>Weekly market insights</h2>
+  <p class="sec-desc">
+    Trade setups, macro analysis, and on-chain signals — every Monday morning. Free, forever.
+  </p>
+
+  <form class="nl-form" onsubmit="nlSubmit(event)">
+    <input class="nl-input" type="email" id="nlEmail" placeholder="your@email.com" required />
+    <button class="nl-btn" type="submit">Subscribe →</button>
+  </form>
+
+  <p class="nl-note">No spam. Unsubscribe anytime. 2,800+ traders already subscribed.</p>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-copy">© 2025 Crypto For Fun Academy. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Use</a>
+    <a href="#">Disclaimer</a>
+    <a href="#">Contact</a>
+  </div>
+</footer>
+
+<!-- ─── ENROLL MODAL ──────────────────────────────────────────── -->
+<div class="overlay" id="enrollModal" onclick="closeOverlay(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-x" onclick="closeModal()" aria-label="Close">✕</button>
+    <h3 id="modalTitle">Enroll today</h3>
+    <p class="modal-sub">We'll confirm your spot within 24 hours.</p>
+
+    <form onsubmit="submitEnroll(event)">
+      <div class="fl">
+        <label>Full name</label>
+        <input class="fi" type="text" placeholder="Your name" required />
+      </div>
+      <div class="fl">
+        <label>Email address</label>
+        <input class="fi" type="email" placeholder="your@email.com" required />
+      </div>
+      <div class="fl">
+        <label>Select plan</label>
+        <select class="fs" id="modalPlan">
+          <option>Starter — $97</option>
+          <option selected>Pro — $297 (Most Popular)</option>
+          <option>Elite — $697</option>
+        </select>
+      </div>
+      <div class="fl">
+        <label>Your experience level</label>
+        <select class="fs">
+          <option>Complete beginner</option>
+          <option>Bought some crypto before</option>
+          <option>Active trader, want to improve</option>
+        </select>
+      </div>
+      <button class="submit" type="submit">Confirm enrollment →</button>
+    </form>
+  </div>
+</div>
+
+<!-- ─── TOAST ─────────────────────────────────────────────────── -->
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <span class="toast-dot"></span>
+  <span id="toastMsg"></span>
+</div>
+
+<!-- ─── SCRIPTS ───────────────────────────────────────────────── -->
+<script>
+/* ── Helpers ── */
+function showToast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+function fmtPrice(v) {
+  if (v >= 1000) return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  if (v >= 1)    return v.toFixed(2);
+  return v.toFixed(4);
+}
+
+/* ── Nav toggle (mobile) ── */
+document.getElementById('navToggle').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+
+/* ── Modal ── */
+function openModal()  { document.getElementById('enrollModal').classList.add('open'); }
+function closeModal() { document.getElementById('enrollModal').classList.remove('open'); }
+
+function closeOverlay(e) {
+  if (e.target === document.getElementById('enrollModal')) closeModal();
+}
+
+function submitEnroll(e) {
+  e.preventDefault();
+  closeModal();
+  showToast('Enrollment confirmed — check your inbox.');
+}
+
+/* ── Newsletter ── */
+function nlSubmit(e) {
+  e.preventDefault();
+  document.getElementById('nlEmail').value = '';
+  showToast('Subscribed! First issue arrives Monday.');
+}
+
+/* ── Ticker ── */
+const TICKER_COINS = ['BTC','ETH','SOL','BNB','XRP','AVAX','DOT','DOGE','ADA','LINK'];
+const TICKER_BASE  = { BTC:67420, ETH:3210, SOL:142, BNB:398, XRP:0.53, AVAX:38, DOT:7.2, DOGE:0.12, ADA:0.45, LINK:14.2 };
+const TICKER_CHGS  = { BTC:2.3, ETH:-1.1, SOL:5.6, BNB:0.8, XRP:3.2, AVAX:-2.4, DOT:-3.2, DOGE:8.1, ADA:-0.6, LINK:1.4 };
+
+(function buildTicker() {
+  const el = document.getElementById('tickerEl');
+  let h = '';
+  for (let i = 0; i < 2; i++) {
+    TICKER_COINS.forEach(s => {
+      const c = TICKER_CHGS[s];
+      const cls  = c >= 0 ? 'up' : 'dn';
+      const sign = c >= 0 ? '+' : '';
+      h += `<div class="tick">
+        <span class="tick-sym">${s}</span>
+        <span class="tick-price">$${fmtPrice(TICKER_BASE[s])}</span>
+        <span class="${cls}">${sign}${c}%</span>
+      </div>`;
+    });
+  }
+  el.innerHTML = h;
+})();
+
+/* ── Chart ── */
+const CHART_DATA = {
+  BTC: { price:67420, chg:2.3,  vol:'$48.2B', cap:'$1.32T', low:65100, high:68900 },
+  ETH: { price:3210,  chg:-1.1, vol:'$22.7B', cap:'$385B',  low:3080,  high:3310  },
+  SOL: { price:142,   chg:5.6,  vol:'$4.1B',  cap:'$62B',   low:131,   high:148   },
+  BNB: { price:398,   chg:0.8,  vol:'$1.8B',  cap:'$58B',   low:388,   high:405   }
+};
+
+let chartInstance = null;
+let currentSym    = 'BTC';
+
+function generatePrices(base, n = 60) {
+  let p = base * 0.94, arr = [];
+  for (let i = 0; i < n; i++) {
+    p *= (1 + (Math.random() - 0.47) * 0.018);
+    arr.push(parseFloat(p.toFixed(4)));
+  }
+  arr[arr.length - 1] = base;
+  return arr;
+}
+
+function switchChart(sym, btn) {
+  currentSym = sym;
+  document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart(sym);
+}
+
+function renderChart(sym) {
+  const d = CHART_DATA[sym];
+
+  document.getElementById('csym').textContent  = sym + ' / USDT';
+  document.getElementById('cprice').textContent = '$' + fmtPrice(d.price);
+
+  const sign = d.chg >= 0 ? '+' : '';
+  const cel  = document.getElementById('cchg');
+  cel.textContent = `${sign}${d.chg}% (24h)`;
+  cel.className   = 'chart-chg ' + (d.chg >= 0 ? 'up' : 'dn');
+
+  document.getElementById('crange').textContent = `$${fmtPrice(d.low)} – $${fmtPrice(d.high)}`;
+  document.getElementById('cvol').textContent   = d.vol;
+  document.getElementById('ccap').textContent   = d.cap;
+  document.getElementById('ctime').textContent  = new Date().toLocaleTimeString();
+
+  const prices = generatePrices(d.price);
+  const ctx    = document.getElementById('priceChart').getContext('2d');
+
+  if (chartInstance) chartInstance.destroy();
+
+  const color = d.chg >= 0 ? '#c8ff00' : '#ff4444';
+  const grad  = ctx.createLinearGradient(0, 0, 0, 200);
+  grad.addColorStop(0, d.chg >= 0 ? 'rgba(200,255,0,0.12)' : 'rgba(255,68,68,0.10)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: prices.map(() => ''),
+      datasets: [{
+        data: prices,
+        borderColor: color,
+        backgroundColor: grad,
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          titleColor: '#666',
+          bodyColor: '#e8e8e8',
+          padding: 10,
+          callbacks: {
+            label: ctx => ' $' + fmtPrice(ctx.parsed.y)
+          }
+        }
+      },
+      scales: {
+        x: { display: false },
+        y: {
+          grid:   { color: 'rgba(255,255,255,0.04)' },
+          border: { color: 'transparent' },
+          ticks:  {
+            color: '#444',
+            font:  { family: 'Inter', size: 11 },
+            callback: v => '$' + fmtPrice(v)
+          }
+        }
+      }
+    }
+  });
+}
+
+/* Initial render */
+renderChart('BTC');
+
+/* Auto-tick prices every 5 s */
+setInterval(() => {
+  Object.keys(CHART_DATA).forEach(s => {
+    CHART_DATA[s].price = parseFloat(
+      (CHART_DATA[s].price * (1 + (Math.random() - 0.5) * 0.0008)).toFixed(4)
+    );
+  });
+  renderChart(currentSym);
+}, 5000);
+</script>
+
+</body>
+</html>
